@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Laboratorio Rupestre Paleolitico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #333;
+            color: #fff;
+            margin: 20px;
+        }
+
+        #controls {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #666;
+            border-radius: 8px;
+            background-color: #444;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #color-black {
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        #color-ochre {
+            background-color: #b84f23; /* Tonalità di ocra rossa */
+            color: #fff;
+        }
+        
+        #clear-button {
+            background-color: #808080;
+            color: #fff;
+        }
+
+        /* Stile che simula la parete rocciosa */
+        #cave-wall {
+            background-color: #a89f82; /* Base color sabbia/roccia */
+            border: 10px solid #6b5c46;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" style="fill:none;stroke:black;stroke-width:2;"><circle cx="15" cy="15" r="10"/></svg>') 15 15, crosshair;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎨 Laboratorio Rupestre Paleolitico</h1>
+    <p>Disegna sulla tela che simula la parete della caverna usando i colori primitivi.</p>
+
+    <div id="controls">
+        **Colore:**
+        <button id="color-black">Carbone (Nero)</button>
+        <button id="color-ochre">Ocra (Rosso)</button>
+        |
+        <button id="clear-button">Cancella</button>
+    </div>
+
+    <canvas id="cave-wall" width="800" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById('cave-wall');
+        const ctx = canvas.getContext('2d');
+        const colorBlack = document.getElementById('color-black');
+        const colorOchre = document.getElementById('color-ochre');
+        const clearButton = document.getElementById('clear-button');
+
+        // Impostazioni iniziali
+        let isDrawing = false;
+        let currentColor = '#1a1a1a'; // Nero (carbone)
+        let strokeWidth = 8; // Spessore del tratto
+
+        // --- Funzioni di disegno ---
+
+        function startDrawing(e) {
+            isDrawing = true;
+            draw(e); // Disegna un punto singolo quando si clicca
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath(); // Resetta il percorso
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            // Calcola la posizione del mouse rispetto al canvas
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.lineWidth = strokeWidth;
+            ctx.lineCap = 'round'; // Linee con estremità arrotondate
+            ctx.strokeStyle = currentColor;
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath(); // Sposta l'inizio del percorso al punto corrente
+            ctx.moveTo(x, y);
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // --- Gestione Eventi ---
+
+        // Eventi per il disegno (Mouse)
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseout', stopDrawing); 
+
+        // Eventi per il disegno (Touch, per dispositivi mobili)
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Evita lo scroll
+            startDrawing(e.touches[0]);
+        });
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            draw(e.touches[0]);
+        });
+        
+
+        // Eventi per la selezione dei colori
+        colorBlack.addEventListener('click', () => {
+            currentColor = '#1a1a1a';
+            strokeWidth = 8;
+        });
+
+        colorOchre.addEventListener('click', () => {
+            currentColor = '#b84f23';
+            strokeWidth = 10; // L'ocra poteva essere applicata in modo più denso
+        });
+        
+        // Evento per cancellare
+        clearButton.addEventListener('click', clearCanvas);
+
+        // Disegna un bordo iniziale sul canvas (opzionale)
+        ctx.fillStyle = '#a89f82';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    </script>
+</body>
+</html>
